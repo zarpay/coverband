@@ -22,7 +22,8 @@
         <p>These <%= tracker.title %> have not been rendered since recording started at <%= tracker.tracking_since %></p>
         <ul>
         <% tracker.unused_keys.each do |key| %>
-          <li class="unused-keys"><%= key %></li>
+          <%# Keys can include external data (e.g. tracked URL paths), so HTML-escape before rendering. %>
+          <li class="unused-keys"><%= ERB::Util.html_escape(key) %></li>
         <% end %>
         </ul>
 
@@ -45,10 +46,11 @@
         <ul>
         <% (sorted_used_keys || tracker.used_keys).each_pair do |key, time_at| %>
           <li class="used-keys">
-            <%= key %>
+            <%# Keys can include external data (e.g. tracked URL paths), so HTML-escape before rendering. %>
+            <%= ERB::Util.html_escape(key) %>
             <span class="last_seen_at">last activity recorded <%= Time.at(time_at.to_i)%></span>
             <% if Coverband.configuration.web_enable_clear %>
-              <%= button("#{base_path}clear_#{tracker.route}_key?key=#{key}", 'reset tracked key', delete: true) %>
+              <%= button("#{base_path}clear_#{tracker.route}_key?key=#{CGI.escape(key.to_s)}", 'reset tracked key', delete: true) %>
             <% end %>
           </li>
         <% end %>
@@ -73,7 +75,8 @@
               <tbody>
                 <% key_stats.each_pair do |key, stats| %>
                   <tr>
-                    <td><%= key %></td>
+                    <%# Keys can include external data (e.g. tracked controller/job names), so HTML-escape before rendering. %>
+                    <td><%= ERB::Util.html_escape(key) %></td>
                     <td><%= stats["requests"].to_i %></td>
                     <td><%= stats["total_queries"].to_i %></td>
                     <td><%= stats["total_sql_time_ms"].to_f.round(2) %></td>
