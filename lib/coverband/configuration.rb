@@ -95,7 +95,7 @@ module Coverband
       @all_root_paths = nil
       @all_root_patterns = nil
       @password = nil
-      @csp_policy = false
+      @csp_policy = true
       @hide_settings = false
 
       # MCP (Model Context Protocol) security settings
@@ -292,10 +292,10 @@ module Coverband
     end
 
     def all_root_patterns
-      @all_root_patterns ||= all_root_paths.map { |path| /^#{path}/ }.freeze
+      @all_root_patterns ||= all_root_paths.map { |path| /^#{Regexp.escape(path)}/ }.freeze
     end
 
-    SKIPPED_SETTINGS = %w[@s3_secret_access_key @store @api_key @password @mcp_password]
+    SKIPPED_SETTINGS = %w[@s3_secret_access_key @store @api_key @password @mcp_password @redis_url @s3_access_key_id]
     def to_h
       instance_variables
         .each_with_object({}) do |var, hash|
